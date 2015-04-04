@@ -1,0 +1,172 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class BanBoxSelector : MonoBehaviour 
+{
+    public Rect _selectionRect;
+    private Rect _fillRect;
+    public Vector2 _dragStartPosition;
+    public Vector2 _dragEndPosition;
+    public bool _isDragging = false;
+    private Vector3 _mousePosition;
+
+    public Texture SelectionTexture;
+    private CommandWindow _commander;
+    private Rect _emptyRect = new Rect(0, 0, 0, 0);
+
+    private const float MIN_DRAG_DISTANCE = 10f;
+    public int SelectionButton;
+
+    void OnGUI()
+    {
+        if (_isDragging)
+        {
+            GetScreenRect();
+            GetFillRect();
+            GUI.DrawTexture(_fillRect, SelectionTexture, ScaleMode.StretchToFill, true);
+        }
+        else
+        {
+            _selectionRect = _emptyRect;
+        }
+    }
+
+    // Use this for initialization
+    void Start () 
+    {
+        _commander = GetComponent<CommandWindow>();
+    }
+    
+
+    // Update is called once per frame
+    void Update () 
+    {
+        _mousePosition = Input.mousePosition;
+        //check for mouse button press, release, and down
+        if (Input.GetMouseButtonDown(SelectionButton))
+        {
+            LeftMousePressed(_mousePosition);
+        }
+
+        if (Input.GetMouseButtonUp(SelectionButton))
+        {
+            LeftMouseReleased(_mousePosition);
+        }
+
+        if (Input.GetMouseButton(SelectionButton))
+        {
+            LeftMouseDrag(_mousePosition);
+        }
+    }
+
+ 
+    private void LeftMouseDrag(Vector2 mousePosition)
+    {
+        if (mousePosition != _dragStartPosition)
+        {
+            _isDragging = true;
+            _dragEndPosition = mousePosition;
+
+            //Alternatively, you could perform selection selection here if you don't
+            //want to wait for the user to release the mouse button
+
+            _commander.ClearSelectedUnits();
+            for (int i = 0; i < _commander.ControlledUnits.Length; i++)
+            {
+                Actor current = _commander.ControlledUnits[i];
+                Vector2 currentScreenPoint = Camera.main.WorldToScreenPoint(current.transform.position);
+
+                if (_selectionRect.Contains(currentScreenPoint))
+                {
+                    _commander.AddToSelectedUnits(current);
+                }
+            }
+        }
+    }
+
+ 
+
+    private void LeftMouseReleased(Vector2 mousePosition)
+    {
+        _isDragging = false;
+        _dragEndPosition = mousePosition;
+        //at this point the user has released the mouse button, perform
+        //selection logic
+    }
+
+ 
+
+    private void LeftMousePressed(Vector2 mousePosition)
+    {
+        _dragStartPosition = mousePosition;
+    }
+
+ 
+
+    /// <summary>
+    /// creates the selection rectangle, normalizing the points so that the
+    /// values are always positive
+    /// </summary>
+
+    private void GetFillRect()
+    {
+        //to start, we assume the user is dragging down and to the right, since this will always yield
+        //positive width and height
+        float x = _dragStartPosition.x;
+        float y = _dragStartPosition.y;
+        float width = _dragEndPosition.x - _dragStartPosition.x;
+        float height = (Screen.height - _dragEndPosition.y) - (Screen.height - _dragStartPosition.y);
+
+ 
+
+        //if the width is negative (user is dragging leftward), swap the x position and make the width positive
+        if (width < 0)
+        {
+            x = _dragEndPosition.x;
+            width = Mathf.Abs(width);
+        }
+        //if the height is negative (user is draggin upward), swap the y position and make the height positive
+
+        if (height < 0)
+        {
+            y = _dragEndPosition.y;
+            height = Mathf.Abs(height);
+        }
+
+        //set the rectangle based on the values
+
+        _fillRect.x = x;
+        _fillRect.y = Screen.height - y;
+        _fillRect.width = width;
+        _fillRect.height = height;
+
+    }
+
+ 
+
+    private void GetScreenRect()
+    {
+        float x = _dragStartPosition.x;
+        float y = _dragStartPosition.y;
+        float width = _dragEndPosition.x - _dragStartPosition.x;
+        float height = _dragEndPosition.y - _dragStartPosition.y;
+
+        if (width < 0)
+        {
+            x = _dragEndPosition.x;
+            width *= -1;
+        }
+
+        if (height < 0)
+        {
+            y = _dragEndPosition.y;
+            height *= -1;
+        }
+
+        _selectionRect.x = x;
+        _selectionRect.y = y;
+        _selectionRect.width = width;
+        _selectionRect.height = height;
+    }
+}

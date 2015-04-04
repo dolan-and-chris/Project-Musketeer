@@ -1,0 +1,13 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Standard Assets\Scripts\PM_Mesh\TerrainGenerator.cs">
+    <Files>
+      <File FileName="Assets\Standard Assets\Scripts\PM_Mesh\TerrainGenerator.cs" Line="231" Column="83" />
+      <File FileName="Assets\Standard Assets\Scripts\PM_Mesh\Cliff.cs" Line="97" Column="4" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
